@@ -23,6 +23,21 @@ resource "aws_glue_job" "{{inputs.job_name}}" {
 
 }
 
+resource "aws_glue_workflow" "workflow-pipeline-dados" {
+    name = "workflow-pipeline-dados"
+    max_concurrent_runs = 10
+}
+
+resource "aws_glue_trigger" "start-trigger" {
+    name = "start-trigger"
+    type = "ON_DEMAND"
+    workflow_name = aws_glue_workflow.workflow-pipeline-dados
+
+    actions {
+      job_name = "{{inputs.job_name}}"
+    }
+}
+
 resource "aws_s3_object" "elt-script-python" {
   bucket = "{{inputs.bucket_name}}"
   key = "automation/script.py"
